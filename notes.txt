@@ -1,0 +1,12 @@
+HARDWARE
+-configurare componente microSD e fare test su del codice
+-snellire codice esp32
+
+
+SERVER
+-snellire codice server
+-configurare raspberry pi per montare il server (ip statico, node js...)
+-vedere se conviene fare il raspberry pi headless
+
+COMPONENTI
+-prendere pulsanti e annesse resistenze (pull-up/up down), per vedere quali prendere basarsi sul progetto https://www.tinkercad.com/things/cLwW6SUVjGe-thermostat-v1-manage-temperature-reference-implemented/editel
