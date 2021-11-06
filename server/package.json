@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.15.0",
+    "ajv": "^8.6.2",
+    "axios": "^0.21.1",
+    "express": "^4.17.1",
+    "mqtt": "^4.2.8"
+  }
+}
