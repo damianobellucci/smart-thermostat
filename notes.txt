@@ -1,5 +1,5 @@
 HARDWARE
--configurare componente microSD e fare test su del codice
+-vedere se è più conveniente usare memoria interna piuttosto che microSD
 -snellire codice esp32
 
 
