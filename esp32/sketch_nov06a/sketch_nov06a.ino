@@ -127,7 +127,7 @@ bool inizialized_setting_parameters = false;
 
 String raw_first_setting_parameters;
 
-#define  SERVER_IP  "http://192.168.1.9:3450/getparameters"
+#define  SERVER_IP  "http://192.168.1.95:3450/getparameters"
 
 bool inizializedSettingParameters(){
     HTTPClient http;
@@ -194,8 +194,6 @@ void setup() {
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send(200, "text/plain", "Hello, world");
   });
-
-
   // Send a GET request to <IP>/get?message=<message>
   server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
       String message;
