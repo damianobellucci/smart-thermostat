@@ -1,0 +1,36 @@
+{
+    "modality": 1,
+    "knights": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+    ],
+    "time": "13:45",
+    "temperatures": [
+        18,
+        20,
+        21
+    ]
+}
+//modality: 1 per manuale, 2 per attivare cavalieri, 3 off

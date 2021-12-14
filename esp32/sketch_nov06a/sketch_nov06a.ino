@@ -127,7 +127,7 @@ bool inizialized_setting_parameters = false;
 
 String raw_first_setting_parameters;
 
-#define  SERVER_IP  "http://192.168.1.95:3450/getparameters"
+#define  SERVER_IP  "http://192.168.1.85:3450/getparameters"
 
 bool inizializedSettingParameters(){
     HTTPClient http;
@@ -247,6 +247,23 @@ void setup() {
       Serial.println(max_moi);
     
       
+      request->send(200, "text/plain", "Hello, POST: " + String(payload));
+  });
+
+    // Send a POST request to <IP>/post with a form field message set to <message>
+  server.on("/bulksetparameters", HTTP_POST, [](AsyncWebServerRequest *request){
+      Serial.println("POST request arrived.");
+      String payload;
+      if (request->hasParam(PARAM_MESSAGE, true)) {
+          payload = request->getParam(PARAM_MESSAGE, true)->value();
+      } else {
+          payload = "No message sent";
+      }
+      
+    
+      Serial.println("Sample bulk:");
+      Serial.println(payload);
+
       request->send(200, "text/plain", "Hello, POST: " + payload);
   });
 

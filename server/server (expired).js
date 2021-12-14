@@ -33,140 +33,6 @@ const configHeaders = {
 var stringSettingParameters;
 
 
-/*************************************************/
-
-const Ajv = require("ajv")
-const ajv = new Ajv() // options can be passed, e.g. {allErrors: true}
-
-const schema_bulksetparameters = {
-    type: "object",
-    required: ["modality", "knights", "time", "temperatures"],
-    properties: {
-        modality: { type: "number" },
-        knights: {
-            type: "array",
-            "minItems": 24,
-            "maxItems": 24,
-            items: {
-                anyOf: [{ type: 'number' }]
-            }
-        },
-        time: { type: "string" },
-        temperatures: {
-            type: "object",
-            required: ["1", "2", "3"],
-            properties: {
-                "1": { type: "number" },
-                "2": { type: "number" },
-                "3": { type: "number" }
-
-            }
-        },
-    },
-    additionalProperties: false,
-}
-
-const validate_bulksetparameters = ajv.compile(schema_bulksetparameters)
-
-function isNumeric(num) {
-    return !isNaN(num)
-}
-/*****************/
-
-
-app.post('/bulksetparameters', function (req, res) {
-
-
-
-    settingParameters = req.body;
-
-    const valid = validate_bulksetparameters(settingParameters)
-    console.log(valid)
-
-    if (!valid) {
-        console.log(validate_bulksetparameters.errors)
-        res.status(400).send({ error: validate_bulksetparameters.errors[0].message })
-    }
-
-
-
-
-
-
-    //CONTINUARE QUANDO ARRIVA TUTTO
-
-    else {
-
-        const params = new URLSearchParams()
-        params.append('message', JSON.stringify(settingParameters))
-        params.append('message', JSON.stringify(settingParameters))
-
-        axios.post("http://192.168.1.30:80/bulksetparameters", params, configHeaders)
-            .then((result) => {
-                fs.readFile('./temporal-config.json', function read(err, data) {
-                    if (err) {
-                        throw err;
-                    }
-                    data = (JSON.parse(data));
-                    fs.writeFile('./config.json', JSON.stringify(data), (err) => {
-                        if (err) {
-                            throw err;
-                        }
-                        currentParameters = data
-                        console.log(result)
-                        res.status(204).send()
-                    });
-                })
-            })
-            .catch((err) => {
-                res.status(502).send({ error: "The parameters have not been set. Impossible to reach the smart pot" })
-                console.log(err)
-            })
-
-
-        /*
-                fs.readFile('./config.json', function read(err, data) {
-                    if (err) {
-                        throw err;
-                    }
-                    let fileSettingParameters = JSON.parse(data);
-                    console.log("asd", fileSettingParameters)
-        
-                    //sovrascrizione parametri
-                    settingParameters.hasOwnProperty("sampleFrequency") ? settingParameters.sampleFrequency = parseInt(settingParameters.sampleFrequency) : null
-                    settingParameters.hasOwnProperty("minTemp") ? settingParameters.minTemp = parseInt(settingParameters.minTemp) : null
-                    settingParameters.hasOwnProperty("maxTemp") ? settingParameters.maxTemp = parseInt(settingParameters.maxTemp) : null
-                    settingParameters.hasOwnProperty("minMoi") ? settingParameters.minMoi = parseInt(settingParameters.minMoi) : null
-                    settingParameters.hasOwnProperty("maxMoi") ? settingParameters.maxMoi = parseInt(settingParameters.maxMoi) : null
-        
-                    try {
-                        list.forEach(f => {
-                            console.log("aaaahhhhh")
-                            f(settingParameters)
-                        })
-                        fs.writeFile('./temporal-config.json', JSON.stringify(settingParameters), (err) => {
-                            if (err) throw err;
-        
-        
-        
-        
-        
-        
-                        })
-        
-                    } catch (e) {
-                        res.status(400).send({ error: e.toString() })
-                    };
-        
-                });
-                */
-
-    }
-
-
-});
-
-
 app.post('/setparameters', function (req, res) {
     console.log(req)
     settingParameters = req.body;
@@ -316,6 +182,36 @@ client.on("error", function (error) {
 });
 
 
+/*************************************************/
+
+const Ajv = require("ajv")
+const ajv = new Ajv() // options can be passed, e.g. {allErrors: true}
+
+const schema = {
+    type: "object",
+    properties: {
+        sampleFrequency: { type: "string" },
+        minTemp: { type: "string" },
+        maxTemp: { type: "string" },
+        minMoi: { type: "string" },
+        maxMoi: { type: "string" }
+    },
+    additionalProperties: false,
+    /*"anyOf": [
+        { "required": ["sampleFrequency"] },
+        { "required": ["minTemp"] },
+        { "required": ["maxTemp"] },
+        { "required": ["minMoi"] },
+        { "required": ["maxMoi"] }
+    ]*/
+}
+
+const validate = ajv.compile(schema)
+
+function isNumeric(num) {
+    return !isNaN(num)
+}
+/*****************/
 
 
 
