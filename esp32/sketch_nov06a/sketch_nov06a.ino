@@ -8,6 +8,66 @@
 #endif
 #include <ESPAsyncWebServer.h>
 AsyncWebServer server(80);
+#include "FS.h"
+#include "SD.h"
+#include "SPI.h"
+
+/*******************SD CARD*****************************/
+
+void readFile(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\n", path);
+
+    File file = fs.open(path);
+    if(!file){
+        Serial.println("Failed to open file for reading");
+        return;
+    }
+
+    Serial.print("Read from file: ");
+    while(file.available()){
+        Serial.write(file.read());
+    }
+    file.close();
+}
+
+void writeFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Writing file: %s\n", path);
+
+    File file = fs.open(path, FILE_WRITE);
+    if(!file){
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+    if(file.print(message)){
+        Serial.println("File written");
+    } else {
+        Serial.println("Write failed");
+    }
+    file.close();
+}
+
+
+
+
+
+
+
+
+
+/******************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const char* PARAM_MESSAGE = "message";
 
@@ -161,8 +221,84 @@ IPAddress secondaryDNS(8, 8, 4, 4); //optional
 
 String ip_server=" ";
 
+int conf_knights[24];
+String conf_time;
+int conf_temperatures[3];
+int conf_modality;
+
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
+  }
+
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
+void parseStringConfig(String string_conf){
+
+  conf_time = getValue(string_conf,',',0);
+  conf_modality = getValue(string_conf,',',1).toInt();
+  conf_temperatures[0] = getValue(string_conf,',',2).toInt();
+  conf_temperatures[1] = getValue(string_conf,',',3).toInt();
+  conf_temperatures[2] = getValue(string_conf,',',4).toInt();
+  conf_knights[0] = getValue(string_conf,',',5).toInt();
+  conf_knights[1] = getValue(string_conf,',',6).toInt();
+  conf_knights[2] = getValue(string_conf,',',7).toInt();
+  conf_knights[3] = getValue(string_conf,',',8).toInt();
+  conf_knights[4] = getValue(string_conf,',',9).toInt();
+  conf_knights[5] = getValue(string_conf,',',10).toInt();
+  conf_knights[6] = getValue(string_conf,',',11).toInt();
+  conf_knights[7] = getValue(string_conf,',',12).toInt();
+  conf_knights[8] = getValue(string_conf,',',13).toInt();
+  conf_knights[9] = getValue(string_conf,',',14).toInt();
+  conf_knights[10] = getValue(string_conf,',',15).toInt();
+  conf_knights[11] = getValue(string_conf,',',16).toInt();
+  conf_knights[12] = getValue(string_conf,',',17).toInt();
+  conf_knights[13] = getValue(string_conf,',',18).toInt();
+  conf_knights[14] = getValue(string_conf,',',19).toInt();
+  conf_knights[15] = getValue(string_conf,',',20).toInt();
+  conf_knights[16] = getValue(string_conf,',',21).toInt();
+  conf_knights[17] = getValue(string_conf,',',22).toInt();
+  conf_knights[18] = getValue(string_conf,',',23).toInt();
+  conf_knights[19] = getValue(string_conf,',',24).toInt();
+  conf_knights[20] = getValue(string_conf,',',25).toInt();
+  conf_knights[21] = getValue(string_conf,',',26).toInt();
+  conf_knights[22] = getValue(string_conf,',',27).toInt();
+  conf_knights[23] = getValue(string_conf,',',28).toInt();         
+
+}
+
 void setup() {
   Serial.begin(115200);
+
+
+  /****** SD CARD***********************************************************************/
+  if(!SD.begin()){
+      Serial.println("Card Mount Failed");
+      return;
+  }
+  uint8_t cardType = SD.cardType();
+
+  if(cardType == CARD_NONE){
+      Serial.println("No SD card attached");
+      return;
+  }
+    
+  //writeFile(SD, "/hello.txt", "12:25,1,18,20,22,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,");
+
+  readFile(SD, "/hello.txt");
+
+
+  /************************************************************************************/
   
   dht.begin();
   
@@ -181,6 +317,7 @@ void setup() {
 
   while (!inizializedSettingParameters()){
     if(WiFi.status() != WL_CONNECTED){
+      
       wifiConnect();
     }
   }
@@ -247,7 +384,7 @@ void setup() {
       Serial.println(max_moi);
     
       
-      request->send(200, "text/plain", "Hello, POST: " + String(payload));
+      request->send(200, "text/plain", "Hello, POST: " + payload);
   });
 
     // Send a POST request to <IP>/post with a form field message set to <message>
@@ -297,6 +434,18 @@ float calculateSHI(float temperature, int moi){
 }
 
 void loop(){
+
+  String string_conf="12:25,1,18,20,22,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,";
+  parseStringConfig(string_conf);
+  Serial.println(conf_time);
+  Serial.println(conf_modality);
+  Serial.println(conf_temperatures[0]);
+  Serial.println(conf_temperatures[1]);
+  Serial.println(conf_temperatures[2]);
+
+  for (int i=0; i<24; i++) {
+    Serial.println(conf_knights[i]);
+  }
  
   //wifi
   if(WiFi.status() != WL_CONNECTED){
