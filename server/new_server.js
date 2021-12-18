@@ -20,7 +20,6 @@ app.use(express.json());
 /****************************/
 
 /*********REQUESTS VALIDATION*********/
-
 const Ajv = require("ajv")
 const ajv = new Ajv()
 
@@ -28,9 +27,29 @@ const validate_setparameters = ajv.compile(
     {
         type: "object",
         properties: {
+            "0": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "1": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "2": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "3": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "4": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "5": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "6": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "7": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "8": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "9": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "10": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "11": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "12": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "13": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "14": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "15": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "16": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "17": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "18": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "19": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "21": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "22": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "23": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "t": { type: "number" },
         },
         additionalProperties: false,
@@ -75,7 +94,7 @@ app.post('/setparameters', function (req, res) {
             }
         )
             .then((result) => {
-                res.status(204)
+                res.status(204).send()
             })
             .catch((err) => {
                 res.status(502).send({ error: "The parameters have not been set. Impossible to reach..." })
@@ -104,6 +123,7 @@ app.get('/currentstate', function (req, res) {
     if (!validate_currentstate(req.query)) {
         res.status(400).send({ error: validate_currentstate.errors })
     }
+
     else {
         axios(
             {
