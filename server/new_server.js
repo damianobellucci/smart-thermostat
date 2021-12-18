@@ -97,7 +97,7 @@ app.post('/setparameters', function (req, res) {
                 res.status(204).send()
             })
             .catch((err) => {
-                res.status(502).send({ error: "The parameters have not been set. Impossible to reach..." })
+                res.status(err.response.status).send({ error: err.response.data })
             })
     }
 });
