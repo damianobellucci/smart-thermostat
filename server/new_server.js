@@ -22,43 +22,38 @@ app.use(express.json());
 const Ajv = require("ajv")
 const ajv = new Ajv()
 
-const schema_setparameters = {
-    type: "object",
-    properties: {
-        k1: { type: "integer", minimum: 0, exclusiveMaximum: 2 },
-        k2: { type: "integer", minimum: 0, exclusiveMaximum: 2 },
-        k3: { type: "integer", minimum: 0, exclusiveMaximum: 2 },
-        threshold: { type: "number" },
-    },
-    additionalProperties: false,
-    minProperties: 1
-}
-
-const validate_setparameters = ajv.compile(schema_setparameters)
+const validate_setparameters = ajv.compile(
+    {
+        type: "object",
+        properties: {
+            "1": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "2": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "3": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "t": { type: "number" },
+        },
+        additionalProperties: false,
+        minProperties: 1
+    }
+)
 /****************************/
-
 
 app.post('/setparameters', function (req, res) {
     if (!validate_setparameters(req.body)) {
-        res.status(400).send({ error: validate_setparameters.errors[0].message })
+        res.status(400).send({ error: validate_setparameters.errors })
     }
     else {
         const params = new URLSearchParams()
         for (let [key, value] of Object.entries(req.body)) {
-            params.append(key, JSON.stringify(value))
+            params.append(key, value)
         }
-        res.send("ok")
-    }
-    /*
         axios.post("http://192.168.1.30:80/setparameters", params, configHeaders)
             .then((result) => {
                 res.status(204).send()
             })
             .catch((err) => {
                 res.status(502).send({ error: "The parameters have not been set. Impossible to reach..." })
-                console.log(err)
             })
-    }*/
+    }
 });
 
 
