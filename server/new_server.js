@@ -120,7 +120,6 @@ app.get('/currentstate', function (req, res) {
                 res.status(502).send({ error: err.code })
             })
     }
-
 });
 
 
