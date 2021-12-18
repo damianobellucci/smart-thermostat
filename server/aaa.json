@@ -1,0 +1,268 @@
+{
+    status: 200,
+    statusText: 'OK',
+    headers: {
+      'content-length': '56',
+      'content-type': 'text/plain',
+      connection: 'close',
+      'accept-ranges': 'none'
+    },
+    config: {
+      url: 'http: //192.168.1.30:80/currentstate?knights',
+      method: 'get',
+      headers: {
+        Accept: 'application/json, text/plain, * /*',
+        'User-Agent': 'axios/0.21.1'
+      },
+      transformRequest: [ [Function: transformRequest] ],
+      transformResponse: [ [Function: transformResponse] ],
+      timeout: 0,
+      adapter: [Function: httpAdapter],
+      xsrfCookieName: 'XSRF-TOKEN',
+      xsrfHeaderName: 'X-XSRF-TOKEN',
+      maxContentLength: -1,
+      maxBodyLength: -1,
+      validateStatus: [Function: validateStatus],
+      data: undefined
+    },
+    request: ClientRequest {
+      _events: [Object: null prototype] {
+        socket: [Function],
+        abort: [Function],
+        aborted: [Function],
+        connect: [Function],
+        error: [Function],
+        timeout: [Function],
+        prefinish: [Function: requestOnPrefinish]
+      },
+      _eventsCount: 7,
+      _maxListeners: undefined,
+      outputData: [],
+      outputSize: 0,
+      writable: true,
+      _last: true,
+      chunkedEncoding: false,
+      shouldKeepAlive: false,
+      useChunkedEncodingByDefault: false,
+      sendDate: false,
+      _removedConnection: false,
+      _removedContLen: false,
+      _removedTE: false,
+      _contentLength: 0,
+      _hasBody: true,
+      _trailer: '',
+      finished: true,
+      _headerSent: true,
+      socket: Socket {
+        connecting: false,
+        _hadError: false,
+        _parent: null,
+        _host: null,
+        _readableState: [ReadableState],
+        readable: true,
+        _events: [Object: null prototype],
+        _eventsCount: 7,
+        _maxListeners: undefined,
+        _writableState: [WritableState],
+        writable: false,
+        allowHalfOpen: false,
+        _sockname: null,
+        _pendingData: null,
+        _pendingEncoding: '',
+        server: null,
+        _server: null,
+        parser: null,
+        _httpMessage: [Circular],
+        [Symbol(asyncId)]: 14,
+        [Symbol(kHandle)]: [TCP],
+        [Symbol(kSetNoDelay)]: false,
+        [Symbol(lastWriteQueueSize)]: 0,
+        [Symbol(timeout)]: null,
+        [Symbol(kBuffer)]: null,
+        [Symbol(kBufferCb)]: null,
+        [Symbol(kBufferGen)]: null,
+        [Symbol(kCapture)]: false,
+        [Symbol(kBytesRead)]: 0,
+        [Symbol(kBytesWritten)]: 0
+      },
+      connection: Socket {
+        connecting: false,
+        _hadError: false,
+        _parent: null,
+        _host: null,
+        _readableState: [ReadableState],
+        readable: true,
+        _events: [Object: null prototype],
+        _eventsCount: 7,
+        _maxListeners: undefined,
+        _writableState: [WritableState],
+        writable: false,
+        allowHalfOpen: false,
+        _sockname: null,
+        _pendingData: null,
+        _pendingEncoding: '',
+        server: null,
+        _server: null,
+        parser: null,
+        _httpMessage: [Circular],
+        [Symbol(asyncId)]: 14,
+        [Symbol(kHandle)]: [TCP],
+        [Symbol(kSetNoDelay)]: false,
+        [Symbol(lastWriteQueueSize)]: 0,
+        [Symbol(timeout)]: null,
+        [Symbol(kBuffer)]: null,
+        [Symbol(kBufferCb)]: null,
+        [Symbol(kBufferGen)]: null,
+        [Symbol(kCapture)]: false,
+        [Symbol(kBytesRead)]: 0,
+        [Symbol(kBytesWritten)]: 0
+      },
+      _header: 'GET /currentstate?knights HTTP/1.1\r\n' +
+        'Accept: application/json, text/plain, */*\r\n' +
+        'User-Agent: axios/0.21.1\r\n' +
+        'Host: 192.168.1.30\r\n' +
+        'Connection: close\r\n' +
+        '\r\n',
+      _keepAliveTimeout: 0,
+      _onPendingData: [Function: noopPendingOutput
+            ],
+      agent: Agent {
+        _events: [Object: null prototype
+                ],
+        _eventsCount: 2,
+        _maxListeners: undefined,
+        defaultPort: 80,
+        protocol: 'http:',
+        options: [Object
+                ],
+        requests: {},
+        sockets: [Object
+                ],
+        freeSockets: {},
+        keepAliveMsecs: 1000,
+        keepAlive: false,
+        maxSockets: Infinity,
+        maxFreeSockets: 256,
+        maxTotalSockets: Infinity,
+        totalSocketCount: 1,
+                [Symbol(kCapture)
+                ]: false
+            },
+      socketPath: undefined,
+      method: 'GET',
+      insecureHTTPParser: undefined,
+      path: '/currentstate?knights',
+      _ended: true,
+      res: IncomingMessage {
+        _readableState: [ReadableState
+                ],
+        readable: false,
+        _events: [Object: null prototype
+                ],
+        _eventsCount: 3,
+        _maxListeners: undefined,
+        socket: [Socket
+                ],
+        connection: [Socket
+                ],
+        httpVersionMajor: 1,
+        httpVersionMinor: 1,
+        httpVersion: '1.1',
+        complete: true,
+        headers: [Object
+                ],
+        rawHeaders: [Array
+                ],
+        trailers: {},
+        rawTrailers: [],
+        aborted: false,
+        upgrade: false,
+        url: '',
+        method: null,
+        statusCode: 200,
+        statusMessage: 'OK',
+        client: [Socket
+                ],
+        _consuming: false,
+        _dumped: false,
+        req: [Circular
+                ],
+        responseUrl: 'http: //192.168.1.30:80/currentstate?knights',
+        redirects: [],
+                [Symbol(kCapture)
+                ]: false
+            },
+      aborted: false,
+      timeoutCb: null,
+      upgradeOrConnect: false,
+      parser: null,
+      maxHeadersCount: null,
+      reusedSocket: false,
+      host: '192.168.1.30',
+      protocol: 'http:',
+      _redirectable: Writable {
+        _writableState: [WritableState
+                ],
+        writable: true,
+        _events: [Object: null prototype
+                ],
+        _eventsCount: 2,
+        _maxListeners: undefined,
+        _options: [Object
+                ],
+        _ended: true,
+        _ending: true,
+        _redirectCount: 0,
+        _redirects: [],
+        _requestBodyLength: 0,
+        _requestBodyBuffers: [],
+        _onNativeResponse: [Function
+                ],
+        _currentRequest: [Circular
+                ],
+        _currentUrl: 'http: //192.168.1.30:80/currentstate?knights',
+                [Symbol(kCapture)
+                ]: false
+            },
+            [Symbol(kCapture)
+            ]: false,
+            [Symbol(kNeedDrain)
+            ]: false,
+            [Symbol(corked)
+            ]: 0,
+            [Symbol(kOutHeaders)
+            ]: [Object: null prototype
+            ] {
+        accept: [Array
+                ],
+        'user-agent': [Array
+                ],
+        host: [Array
+                ]
+            }
+        },
+    data: 'knights: 0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0;'
+    }
