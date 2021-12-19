@@ -51,6 +51,13 @@ const validate_setparameters = ajv.compile(
             "22": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "23": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "t": { type: "number" },
+
+            "hh": { type: "integer", minimum: 1, exclusiveMaximum: 100 },
+            "mm": { type: "integer", minimum: 1, exclusiveMaximum: 100 },
+            "ss": { type: "integer", minimum: 1, exclusiveMaximum: 100 },
+            "dd": { type: "integer", minimum: -365, exclusiveMaximum: 365 },
+
+
         },
         additionalProperties: false,
         minProperties: 1
@@ -65,10 +72,11 @@ const validate_currentstate = ajv.compile(
             "threshold": { type: "string" },
             "status": { type: "string" },
             "knights": { type: "string" },
+            "time": { type: "string" },
         },
         additionalProperties: false,
         minProperties: 1,
-        maxProperties: 4
+        maxProperties: 5
     }
 )
 /****************************/
@@ -97,7 +105,8 @@ app.post('/setparameters', function (req, res) {
                 res.status(204).send()
             })
             .catch((err) => {
-                res.status(err.response.status).send({ error: err.response.data })
+                if (err.response == undefined) res.status(503).send({ error: err.code })
+                else res.status(err.response.status).send({ error: err.response.data })
             })
     }
 });
@@ -113,6 +122,19 @@ function parseDataCurrentState(data) {
                 obj_knights[i] = Number(list[i])
             }
             obj[el[0]] = obj_knights
+        }
+        else if (el[0] == "time") {
+            let list = el[1].split(",")
+            let obj_time = {}
+
+            obj_time["hh"] = Number(list[0])
+            obj_time["mm"] = Number(list[1])
+            obj_time["ss"] = Number(list[2])
+            obj_time["dd"] = Number(list[3])
+            obj_time["mo"] = Number(list[4])
+            obj_time["yy"] = Number(list[5])
+
+            obj[el[0]] = obj_time
         }
         else obj[el[0]] = Number(el[1])
     }
