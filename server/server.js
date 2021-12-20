@@ -82,6 +82,7 @@ const validate_currentstate = ajv.compile(
 /****************************/
 
 app.post('/setparameters', function (req, res) {
+    console.log("request POST /setparameters");
     if (!validate_setparameters(req.body)) {
         res.status(400).send({ error: validate_setparameters.errors })
     }
@@ -142,6 +143,7 @@ function parseDataCurrentState(data) {
 }
 
 app.get('/currentstate', function (req, res) {
+    console.log("request GET /currentstate");
     if (!validate_currentstate(req.query)) {
         res.status(400).send({ error: validate_currentstate.errors })
     }
