@@ -1,357 +1,173 @@
-/*************************************************/
-var fs = require('fs')
-var express = require('express')
-var app = express()
-const PORT = 3450
+const URL_HARDWARE = "http://192.168.1.30:80"
 
-currentParameters = {}
-
-fs.readFile('./config.json', function read(err, data) {
-    if (err) {
-        throw err;
-    }
-
-    currentParameters = JSON.parse(data)
-});
-
-
-
-app.use(express.json());
-
-const axios = require('axios')
-
-
+/***********CONFIGURE CLIENT FOR INTERACTION WITH ESP32 */
 const configHeaders = {
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
     },
     timeout: 10000 //timeout in milliseconds
 }
+/*****************************************************/
 
+const axios = require('axios')
 
+/*********SERVER CONFIG*********/
+var express = require('express')
+var app = express()
+const PORT = 3450
+app.use(express.json());
 
-var stringSettingParameters;
+/****************************/
 
-
-/*************************************************/
-
+/*********REQUESTS VALIDATION*********/
 const Ajv = require("ajv")
-const ajv = new Ajv() // options can be passed, e.g. {allErrors: true}
+const ajv = new Ajv()
 
-const schema_bulksetparameters = {
-    type: "object",
-    required: ["modality", "knights", "time", "temperatures"],
-    properties: {
-        modality: { type: "number" },
-        knights: {
-            type: "array",
-            "minItems": 24,
-            "maxItems": 24,
-            items: {
-                anyOf: [{ type: 'number' }]
-            }
+const validate_setparameters = ajv.compile(
+    {
+        type: "object",
+        properties: {
+            "0": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "1": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "2": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "3": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "4": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "5": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "6": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "7": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "8": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "9": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "10": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "11": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "12": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "13": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "14": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "15": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "16": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "17": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "18": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "19": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "21": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "22": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "23": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "t": { type: "number" },
+
+            "hh": { type: "integer", minimum: 1, exclusiveMaximum: 100 },
+            "mm": { type: "integer", minimum: 1, exclusiveMaximum: 100 },
+            "ss": { type: "integer", minimum: 1, exclusiveMaximum: 100 },
+            "dd": { type: "integer", minimum: -365, exclusiveMaximum: 365 },
+
+
         },
-        time: { type: "string" },
-        temperatures: {
-            type: "object",
-            required: ["1", "2", "3"],
-            properties: {
-                "1": { type: "number" },
-                "2": { type: "number" },
-                "3": { type: "number" }
+        additionalProperties: false,
+        minProperties: 1
+    }
+)
 
-            }
+const validate_currentstate = ajv.compile(
+    {
+        type: "object",
+        properties: {
+            "temperature": { type: "string" },
+            "threshold": { type: "string" },
+            "status": { type: "string" },
+            "knights": { type: "string" },
+            "time": { type: "string" },
         },
-    },
-    additionalProperties: false,
-}
-
-const validate_bulksetparameters = ajv.compile(schema_bulksetparameters)
-
-function isNumeric(num) {
-    return !isNaN(num)
-}
-/*****************/
-
-
-app.post('/bulksetparameters', function (req, res) {
-    settingParameters = req.body;
-
-    const valid = validate_bulksetparameters(settingParameters)
-    console.log(valid)
-
-    if (!valid) {
-        console.log(validate_bulksetparameters.errors)
-        res.status(400).send({ error: validate_bulksetparameters.errors[0].message })
+        additionalProperties: false,
+        minProperties: 1,
+        maxProperties: 5
     }
-
-    else {
-        const params = new URLSearchParams()
-        params.append('message', JSON.stringify(settingParameters))
-
-        axios.post("http://192.168.1.30:80/bulksetparameters", params, configHeaders)
-            .then((result) => {
-                fs.readFile('./temporal-config.json', function read(err, data) {
-                    if (err) {
-                        throw err;
-                    }
-                    data = (JSON.parse(data));
-                    fs.writeFile('./config.json', JSON.stringify(data), (err) => {
-                        if (err) {
-                            throw err;
-                        }
-                        currentParameters = data
-
-                        res.status(204).send()
-                    });
-                })
-            })
-            .catch((err) => {
-                res.status(502).send({ error: "The parameters have not been set. Impossible to reach the smart pot" })
-                console.log(err)
-            })
-    }
-});
-
+)
+/****************************/
 
 app.post('/setparameters', function (req, res) {
-    console.log(req)
-    settingParameters = req.body;
-    Object.keys(settingParameters).forEach((key) => {
-        settingParameters[key] = settingParameters[key].toString();
-    });
-    console.log(settingParameters)
-    console.log("arrived request: ", settingParameters)
-
-    console.log("ciao")
-    const valid = validate(settingParameters)
-    if (!valid) {
-        console.log(validate.errors)
-        res.status(400).send({ error: validate.errors[0].message })
+    if (!validate_setparameters(req.body)) {
+        res.status(400).send({ error: validate_setparameters.errors })
     }
     else {
-
-        if (!settingParameters.hasOwnProperty("sampleFrequency") && !settingParameters.hasOwnProperty("minTemp") && !settingParameters.hasOwnProperty("maxTemp") && !settingParameters.hasOwnProperty("minMoi") && !settingParameters.hasOwnProperty("maxMoi")) {
-            res.send({ error: "at least one parameter must be setted." })
+        const params = new URLSearchParams()
+        for (let [key, value] of Object.entries(req.body)) {
+            params.append(key, value)
         }
-        else {
-
-
-
-            if (
-                (settingParameters.hasOwnProperty("sampleFrequency") && !isNumeric(settingParameters.sampleFrequency))
-                ||
-                (settingParameters.hasOwnProperty("minTemp") && !isNumeric(settingParameters.minTemp))
-                ||
-                (settingParameters.hasOwnProperty("maxTemp") && !isNumeric(settingParameters.maxTemp))
-                ||
-                (settingParameters.hasOwnProperty("minMoi") && !isNumeric(settingParameters.minMoi))
-                ||
-                (settingParameters.hasOwnProperty("maxMoi") && !isNumeric(settingParameters.maxMoi))
-            ) {
-                res.send({ "error": "parameters must be numbers" })
+        axios(
+            {
+                method: 'post',
+                url: URL_HARDWARE + "/setparameters",
+                data: params,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                timeout: 10000 //timeout in milliseconds
             }
-            else {
-                fs.readFile('./config.json', function read(err, data) {
-                    if (err) {
-                        throw err;
-                    }
-                    let fileSettingParameters = JSON.parse(data);
-                    console.log("asd", fileSettingParameters)
-
-                    //sovrascrizione parametri
-                    settingParameters.hasOwnProperty("sampleFrequency") ? settingParameters.sampleFrequency = parseInt(settingParameters.sampleFrequency) : null
-                    settingParameters.hasOwnProperty("minTemp") ? settingParameters.minTemp = parseInt(settingParameters.minTemp) : null
-                    settingParameters.hasOwnProperty("maxTemp") ? settingParameters.maxTemp = parseInt(settingParameters.maxTemp) : null
-                    settingParameters.hasOwnProperty("minMoi") ? settingParameters.minMoi = parseInt(settingParameters.minMoi) : null
-                    settingParameters.hasOwnProperty("maxMoi") ? settingParameters.maxMoi = parseInt(settingParameters.maxMoi) : null
-
-                    try {
-                        list.forEach(f => {
-                            console.log("aaaahhhhh")
-                            f(settingParameters)
-                        })
-                        fs.writeFile('./temporal-config.json', JSON.stringify(settingParameters), (err) => {
-                            if (err) throw err;
-                            console.log('The file has been saved!');
-                            string = settingParameters.sampleFrequency + ";" + settingParameters.minTemp + ";" + settingParameters.maxTemp + ";" + settingParameters.minMoi + ";" + settingParameters.maxMoi + ";";
-                            stringSettingParameters = string;
-                            const params = new URLSearchParams()
-                            params.append('message', string)
-
-                            axios.post("http://192.168.1.30:80/post", params, configHeaders)
-                                .then((result) => {
-                                    fs.readFile('./temporal-config.json', function read(err, data) {
-                                        if (err) {
-                                            throw err;
-                                        }
-                                        data = (JSON.parse(data));
-                                        fs.writeFile('./config.json', JSON.stringify(data), (err) => {
-                                            if (err) {
-                                                throw err;
-                                            }
-                                            currentParameters = data
-                                            console.log(result)
-                                            res.status(204).send()
-                                        });
-                                    })
-                                })
-                                .catch((err) => {
-                                    res.status(502).send({ error: "The parameters have not been set. Impossible to reach the smart pot" })
-                                    console.log(err)
-                                })
-                        })
-
-                    } catch (e) {
-                        res.status(400).send({ error: e.toString() })
-                    };
-
-                });
-
-            }
-        }
+        )
+            .then((result) => {
+                res.status(204).send()
+            })
+            .catch((err) => {
+                if (err.response == undefined) res.status(503).send({ error: err.code })
+                else res.status(err.response.status).send({ error: err.response.data })
+            })
     }
 });
 
-
-
-app.get('/getparameters', function (req, res) {
-
-    fs.readFile('./config.json', function read(err, data) {
-        if (err) {
-            throw err;
+function parseDataCurrentState(data) {
+    let obj = {}
+    for (const element of data.split(";").slice(0, -1)) {
+        let el = element.split(":")
+        if (el[0] == "knights") {
+            let list = el[1].split(",")
+            let obj_knights = {}
+            for (let i = 0; i < list.length; i++) {
+                obj_knights[i] = Number(list[i])
+            }
+            obj[el[0]] = obj_knights
         }
-        data = (JSON.parse(data));
-        console.log(data)
-        final = data.sampleFrequency + ";" + data.minTemp + ";" + data.maxTemp + ";" + data.minMoi + ";" + data.maxMoi + ";";
-        res.send(final);
+        else if (el[0] == "time") {
+            let list = el[1].split(",")
+            let obj_time = {}
 
+            obj_time["hh"] = Number(list[0])
+            obj_time["mm"] = Number(list[1])
+            obj_time["ss"] = Number(list[2])
+            obj_time["dd"] = Number(list[3])
+            obj_time["mo"] = Number(list[4])
+            obj_time["yy"] = Number(list[5])
 
-    });
+            obj[el[0]] = obj_time
+        }
+        else obj[el[0]] = Number(el[1])
+    }
+    return obj
+}
 
-})
+app.get('/currentstate', function (req, res) {
+    if (!validate_currentstate(req.query)) {
+        res.status(400).send({ error: validate_currentstate.errors })
+    }
+
+    else {
+        axios(
+            {
+                method: "get",
+                url: URL_HARDWARE + "/currentstate",
+                params: req.query,
+                timeout: 10000
+            }
+        )
+            .then((result) => {
+                res.status(200).send(parseDataCurrentState(result.data))
+            })
+            .catch((err) => {
+                res.status(502).send({ error: err.code })
+            })
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log("listening port ", PORT)
 })
 
 
-/*************************************************/
-var mqtt = require('mqtt')
-const IPbroker = 'mqtt://130.136.2.70:1883'
-const topic_1 = 'damianobellucci/test_setting_parameters'
-const options = {
-    clientId: 'clientJSpub',
-    protocolId: 'MQIsdp',
-    protocolVersion: 3,
-    connectTimeout: 1000,
-    debug: true,
-    username: 'IOTuser',
-    password: 'IOTuser',
-    retain: true,
-    qos: 2 //perché voglio che parametri di settaggio arrivino al broker senza duplicati e senza dubbio che non siano arrivati
-};
-var client = mqtt.connect(IPbroker, options);
 
-
-client.on('connect', function () {
-    console.log("mqtt connected")
-})
-
-client.on("error", function (error) {
-    console.log("Mqtt error: " + error);
-});
-
-
-
-
-
-//prendo vecchia config (da file ) e ci applico sopra quella nuova, a quella nuova applico il test e se c'è qualche errore faccio una throw
-errors = {
-    one: "minMoi and maxMoi values must be between zero and 100",
-    two: "minMoi must be less than maxMoi",
-    three: "minTemp and maxTemp values must be between -40 and 125",
-    four: "minTemp must be less than maxTemp",
-    five: "sampleFrequency must not be less than 100 and less than 5000",
-    six: "minTemp must be less than maxTemp. Current minTemp: ",
-    seven: "maxTemp must be less than minTemp. Current maxTemp: ",
-    eight: "minMoi must be less than maxMoi. Current maxMoi: ",
-    nine: "maxMoi must be less than minMoi. Current maxMoi: "
-}
-
-function test1(obj) {
-    if (obj.minMoi < 0 || obj.minMoi > 100)
-        throw (errors.one)
-}
-
-function test2(obj) {
-    if (obj.minMoi > obj.maxMoi)
-        throw (errors.two)
-}
-
-function test3(obj) {
-    if (obj.minTemp < -40 || obj.maxTemp > 125)
-        throw (errors.three)
-}
-
-function test4(obj) {
-    if (obj.minTemp > obj.maxTemp)
-        throw (errors.four)
-}
-
-function test5(obj) {
-    if (obj.sampleFrequency < 100 || obj.sampleFrequency >= 5000)
-        throw (errors.five)
-}
-
-function test6(obj) {
-    if (obj.minTemp > currentParameters.maxTemp && !obj.hasOwnProperty('maxTemp')) {
-        throw (errors.six + currentParameters.maxTemp)
-    }
-}
-
-function test7(obj) {
-    if (obj.maxTemp < currentParameters.minTemp && !obj.hasOwnProperty('minTemp')) {
-        throw (errors.seven + currentParameters.minTemp)
-    }
-}
-
-function test8(obj) {
-    console.log("lol", obj)
-    if (obj.minMoi > currentParameters.maxMoi && !obj.hasOwnProperty('maxMoi')) {
-        throw (errors.eight + currentParameters.maxMoi)
-    }
-}
-
-function test9(obj) {
-    if (obj.maxMoi < currentParameters.minMoi && !obj.hasOwnProperty('minMoi')) {
-        throw (errors.nine + currentParameters.minMoi)
-    }
-}
-
-
-
-
-list = [test1, test2, test3, test4, test5, test6, test7, test8, test9]
-
-
-//let a = { "minMoi": 1, "maxMoi": 10, "minTemp": 1, "maxTemp": 3, "sampleFrequency": 4 }
-
-
-
-/*
-if (client.connected) {
-client.publish(topic_1, string.toString(), options, function (err) {
-    if (err) {
-        res.send(err)
-        console.log(err)
-    }
-    else {
-        console.log('-published: ', string)
-        res.send({ ack: '', committedRequest: string })
-    }
-});
-}
-else {
-res.send({ failed: "something wrong in the server. Try again." })
-}*/
