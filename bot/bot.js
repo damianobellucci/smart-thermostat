@@ -7,10 +7,19 @@ const token = '5040146541:AAH-qPWsDsn-Z34fcaePsncU_uqOKfPSKiY';
 const bot = new TelegramBot(token, { polling: true });
 bot.on("polling_error", console.log);
 
+bot.setMyCommands([
+    { command: '/start', description: 'start with main menu' },
+    { command: '/getstatus', description: 'get all the informations' },
+    { command: '/setparameters', description: 'display all the possibilities for setting parameters' },
+    { command: '/modifythreshold', description: 'modify on/off threshold' },
+    { command: '/setknights', description: 'set hour knights' },
+    { command: '/modifytime', description: 'shift time by adding/subtract days, hours, minutes, seconds' },
+])
+
 const axios = require('axios')
 
 
-var lastTopic;
+var lastTopic = {}; //hash table per tenere traccia dello stato di ogni utente, evitando sovrapposizioni
 var defaultMenu = '/getstatus\n/setparameters';
 var menuSentence = 'Choose between these:\n';
 var defaultMenu_sentence = 'Choose between these:\n' + defaultMenu;
@@ -22,10 +31,10 @@ bot.on('message', (msg) => {
     switch (msg.text) {
         case ("/start"):
             bot.sendMessage(chatId, defaultMenu_sentence);
-            lastTopic = null
+            lastTopic[chatId] = null
             break;
         case ("/getstatus"):
-            lastTopic = null;
+            lastTopic[chatId] = null;
             params = {
                 temperature: '',
                 status: '',
@@ -52,7 +61,7 @@ bot.on('message', (msg) => {
                         "Temperature: " + result.data.temperature + " °C" + "\n" +
                         "Status: " + (() => { return result.data.status == 1 ? "on" : "off" })() + "\n" +
                         "Threshold: " + result.data.threshold + " °C" + "\n" +
-                        "Time: " + result.data.time.hh + ":" + result.data.time.mm + ":" + result.data.time.ss + " " + result.data.time.dd + "/" + result.data.time.mm + "/" + result.data.time.yy + "\n" +
+                        "Time: " + result.data.time.hh + ":" + result.data.time.mm + ":" + result.data.time.ss + " " + result.data.time.dd + "/" + result.data.time.mo + "/" + result.data.time.yy + "\n" +
                         "Knights: " + str_knights
 
                     await bot.sendMessage(chatId, final_string);
@@ -67,30 +76,29 @@ bot.on('message', (msg) => {
 
             break;
         case ("/setparameters"):
-            lastTopic = null;
-            bot.sendMessage(chatId, menuSentence + '/threshold\n/setknights\n/modifytime');
-            lastTopic = "setparameters"
+            lastTopic[chatId] = null;
+            bot.sendMessage(chatId, menuSentence + '/modifythreshold\n/setknights\n/modifytime' + "\n\n Or return to default menu:\n /start");
+            lastTopic[chatId] = "setparameters"
             break;
-        case ("/threshold"):
+        case ("/modifythreshold"):
             bot.sendMessage(chatId, 'Write a value: ');
-            lastTopic = "threshold"
+            lastTopic[chatId] = "threshold"
             break;
         case ("/setknights"):
-            lastTopic = "setknights"
+            lastTopic[chatId] = "setknights"
             bot.sendMessage(chatId, 'Write the number of the knight spaced with on/off:');
             break;
         case ("/modifytime"):
-            lastTopic = "modifytime"
+            lastTopic[chatId] = "modifytime"
             bot.sendMessage(chatId, 'Add/subtract dd hh mm ss (ex: hh 2):');
             break;
         default:
-            switch (lastTopic) {
+            switch (lastTopic[chatId]) {
                 case ("modifytime"):
                     if (
                         !(() => {
 
                             let lst = msg.text.split(" ").filter(x => x != "" ? x : null)
-                            console.log(lst.length)
                             return lst.length == 2 && ['hh', 'dd', 'mm', 'ss'].includes(lst[0]) && !isNaN(lst[1])
                         })()
                     ) {
@@ -115,14 +123,14 @@ bot.on('message', (msg) => {
                             .then(async (result) => {
                                 await bot.sendMessage(chatId, 'New setting is ok.');
                                 bot.sendMessage(chatId, defaultMenu_sentence);
-                                lastTopic = null;
+                                lastTopic[chatId] = null;
                             })
                             .catch(async (err) => {
                                 if (err.response.data.error[0].message == undefined) {
                                     await bot.sendMessage(chatId, "Something went wrong. Request not satisfied.");
                                     defaultMenu_sentence
                                     bot.sendMessage(chatId, defaultMenu_sentence);
-                                    lastTopic = null
+                                    lastTopic[chatId] = null
                                 }
                                 else {
                                     bot.sendMessage(chatId, "The value " + err.response.data.error[0].message + ". Retry:");
@@ -158,14 +166,14 @@ bot.on('message', (msg) => {
                             .then(async (result) => {
                                 await bot.sendMessage(chatId, 'New setting is ok.');
                                 bot.sendMessage(chatId, defaultMenu_sentence);
-                                lastTopic = null;
+                                lastTopic[chatId] = null;
                             })
                             .catch(async (err) => {
                                 if (err.response.data.error[0].message == undefined) {
                                     await bot.sendMessage(chatId, "Something went wrong. Request not satisfied.");
                                     defaultMenu_sentence
                                     bot.sendMessage(chatId, defaultMenu_sentence);
-                                    lastTopic = null
+                                    lastTopic[chatId] = null
                                 }
                                 else {
                                     bot.sendMessage(chatId, err.response.data.error[0].message + ". Retry:");
@@ -192,14 +200,14 @@ bot.on('message', (msg) => {
                             .then(async (result) => {
                                 await bot.sendMessage(chatId, 'New setting is ok.');
                                 bot.sendMessage(chatId, defaultMenu_sentence);
-                                lastTopic = null;
+                                lastTopic[chatId] = null;
                             })
                             .catch(async (err) => {
                                 if (err.response.data.error[0].message == undefined) {
                                     await bot.sendMessage(chatId, "Something went wrong. Request not satisfied.");
                                     defaultMenu_sentence
                                     bot.sendMessage(chatId, defaultMenu_sentence);
-                                    lastTopic = null
+                                    lastTopic[chatId] = null
                                 }
                                 else {
                                     bot.sendMessage(chatId, "The value " + err.response.data.error[0].message + ". Retry:");
