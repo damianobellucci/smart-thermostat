@@ -47,6 +47,7 @@ const validate_setparameters = ajv.compile(
             "17": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "18": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "19": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
+            "20": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "21": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "22": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "23": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
