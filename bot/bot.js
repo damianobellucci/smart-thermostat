@@ -66,7 +66,7 @@ bot.on('message', (msg) => {
                         })
                         .catch((err) => {
                             console.log(err);
-                            bot.sendMessage(chatId, "something wrong.");
+                            bot.sendMessage(chatId, err.response.data.error);
 
                         })
                     break;
