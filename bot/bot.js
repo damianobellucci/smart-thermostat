@@ -11,6 +11,8 @@ const bot = new TelegramBot(token, { polling: true });
 
 var lastTopic;
 
+var defaultMenu = '/getstatus\n/setparameters';
+
 
 // Listen for any kind of message. There are different kinds of
 // messages.
@@ -29,45 +31,47 @@ bot.on('message', (msg) => {
             lastTopic = "getstatus"
             break;
         case ("/setparameters"):
-            bot.sendMessage(chatId, '/threshold\n/setknights\n/modifytime');
+            bot.sendMessage(chatId, '/threshold\n/setknights\n/modifytime\n/set_time');
             lastTopic = "setparameters"
             break;
         case ("/threshold"):
-            bot.sendMessage(chatId, 'Write a value between 0 and 40:');
+            bot.sendMessage(chatId, 'Write a value: ');
             lastTopic = "threshold"
             break;
         case ("/setknights"):
             lastTopic = "setknights"
             bot.sendMessage(chatId, 'Write the number of the knight spaced with on/off');
             break;
+        case ("/set_time"):
+            lastTopic = "set_time"
+            bot.sendMessage(chatId, 'Write the number of the knight spaced with on/off');
+            break;
         default:
             switch (lastTopic) {
                 case ("threshold"):
                     lastTopic = null;
-                    if (!isNaN(msg.text)) {
-                        console.log("ok")
-                        axios(
-                            {
-                                method: 'post',
-                                url: URL_SERVER + "/setparameters",
-                                data: { "t": parseInt(msg.text) },
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                timeout: 10000 //timeout in milliseconds
-                            }
-                        )
-                            .then((result) => {
-                                bot.sendMessage(chatId, 'New setting is ok.');
-                            })
-                            .catch((err) => {
-                                if (err.response == undefined) {
-                                    bot.sendMessage(chatId, err.code);
-                                }
-                                else bot.sendMessage(chatId, err.response.data);
-                            })
-                    }
+                    axios(
+                        {
+                            method: 'post',
+                            url: URL_SERVER + "/setparameters",
+                            data: { "t": parseInt(msg.text) },
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            timeout: 10000 //timeout in milliseconds
+                        }
+                    )
+                        .then((result) => {
+                            bot.sendMessage(chatId, 'New setting is ok.');
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            bot.sendMessage(chatId, "something wrong.");
+
+                        })
+                    break;
                 default:
+                    bot.sendMessage(chatId, 'Invalid operation. Choose between these:\n' + defaultMenu);
                     break;
             }
     }
