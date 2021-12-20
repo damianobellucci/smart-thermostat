@@ -84,7 +84,7 @@ const validate_currentstate = ajv.compile(
 app.post('/setparameters', function (req, res) {
     console.log("request POST /setparameters");
     if (!validate_setparameters(req.body)) {
-        res.status(400).send({ error: validate_setparameters.errors })
+        res.status(400).send({ error: validate_setparameters.errors[0].message })
     }
     else {
         const params = new URLSearchParams()
