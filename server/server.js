@@ -50,7 +50,7 @@ const validate_setparameters = ajv.compile(
             "21": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "22": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "23": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
-            "t": { type: "number" },
+            "t": { type: "number", minimum: 0, exclusiveMaximum: 40 },
 
             "hh": { type: "integer", minimum: -120, exclusiveMaximum: 100 },
             "mm": { type: "integer", minimum: -100, exclusiveMaximum: 100 },
