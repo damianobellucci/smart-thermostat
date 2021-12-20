@@ -52,7 +52,7 @@ const validate_setparameters = ajv.compile(
             "23": { type: "integer", minimum: 0, exclusiveMaximum: 2 },
             "t": { type: "number" },
 
-            "hh": { type: "integer", minimum: -100, exclusiveMaximum: 100 },
+            "hh": { type: "integer", minimum: -120, exclusiveMaximum: 100 },
             "mm": { type: "integer", minimum: -100, exclusiveMaximum: 100 },
             "ss": { type: "integer", minimum: -100, exclusiveMaximum: 100 },
             "dd": { type: "integer", minimum: -365, exclusiveMaximum: 365 },
